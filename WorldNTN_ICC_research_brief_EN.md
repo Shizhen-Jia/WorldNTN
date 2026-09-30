@@ -1,204 +1,187 @@
 # WorldNTN: Research Brief for Advisor Discussion
 
-**Working title:** *Task-Aware Active Probing for Predictive Receive Beam Control under LEO Cochannel Interference*
+**Working title:** *Predictive Joint Receive Beamforming, Satellite Association, and Resource Reallocation under Partially Observed Interference*
 
-**Status:** Proposed research targeting IEEE ICC; no implementation or experimental results are claimed. Scope and milestones follow scientific evidence rather than a submission deadline. This brief condenses the [full research plan](WorldNTN_ICC_concrete_research_plan.md).
+**Status:** Proposed research targeting IEEE ICC; no implementation or results are claimed. This version replaces the single-terminal, fixed-serving-satellite scope with coordinated multiuser, multisatellite control. It summarizes the [full Chinese research plan](WorldNTN_ICC_concrete_research_plan.md). Milestones follow evidence rather than a submission deadline.
 
-## 1. Research question and motivation
+## 1. Research question
 
-**When should a ground terminal spend reception time probing interference, and which direction should it probe, to improve its subsequent receive-beam decisions?**
+**When should an interfered terminal adjust its receive beam, share resources on its current satellite, or hand over—and how should the network account for the consequences for other users?**
 
-Consider a fixed ground terminal receiving a saturated downlink from one serving LEO satellite, with noncooperative cochannel interference from other LEO satellites. Available ephemerides predict their directions and distances, but not their transmission activity or actual illumination power.
+Consider fixed ground terminals distributed across the contiguous United States and multiple LEO satellites operated by one coordinated network. Each terminal has a single RF chain and a quantized phase-only receive array. It can maintain at most one active satellite data connection, while a satellite serves multiple terminals with limited resources.
 
-The terminal has a **single RF chain and a quantized, phase-only receive array**. It observes one spatial combination at a time; it cannot continuously obtain all antenna samples or a full interference covariance matrix. Additional directional measurements therefore consume reception time and may interrupt service.
+Two mechanisms motivate prediction:
 
-The central hypothesis is that **probing should reduce uncertainty that can change future communication decisions, rather than maximize general information gain**. Predictable orbital geometry determines when uncertain interference becomes relevant; temporal dynamics determine whether a measurement remains informative when its result arrives.
+- **Proactive resource release:** User A could remain on S1 to avoid a handover, but moving A to S2 may free capacity for user B, who will soon have a much better opportunity on S1 and few alternatives.
+- **Interference-driven reassignment:** A disturbance may make A seek S2, affecting its existing users. The network can reduce allocations, defer admission, or move another user to S3. A chain of handovers is an outcome to evaluate, not a mandatory rule.
 
-The initial scope excludes handover, malicious-attack attribution, multiuser scheduling, and coordinated satellite transmit control. Single-RF hardware is an explicit assumption, to be tested against multiple-RF and full-observation references.
+The central hypothesis is that **joint prediction can identify when local interference suppression is preferable to network-wide reassignment, and when the future service gains justify migration costs**. Decisions concern multiple users over a horizon; only currently executable actions are committed before replanning.
 
-## 2. System, observations, and objective
+## 2. Scope and physical model
 
-### Physical model and actions
+### Receive beamforming remains a core control
 
-Let $\mathbf a_{j,t}$ be the known array response toward interferer $j$. Unknown effective received powers $p_{j,t}\geq0$ capture activity, illumination, and propagation residuals. The interference-plus-noise covariance is
-
-$$
-\mathbf R_t=\sum_jp_{j,t}\mathbf a_{j,t}\mathbf a_{j,t}^{H}
-+(p_{\mathrm{diff},t}+\sigma_n^2)\mathbf I.
-$$
-
-For communication beam $a$, with feasible phase-only weights $\mathbf w_{a,t}$,
+For an $M$-element terminal array,
 
 $$
-\mathrm{SINR}_t(a)=
-\frac{S_t|\mathbf w_{a,t}^{H}\mathbf a_{s,t}|^2}
-{\mathbf w_{a,t}^{H}\mathbf R_t\mathbf w_{a,t}},
-\qquad |[\mathbf w_{a,t}]_m|=1/\sqrt M.
+y_u=\mathbf w_u^H\mathbf x_u,\qquad
+[\mathbf w_u]_m=M^{-1/2}e^{j\phi_{u,m}},
 $$
 
-$S_t$ is the unknown serving-link power before array gain. Phase values are quantized. All competing algorithms share a geometry-generated communication codebook, initially 12–32 beams, including matched and interference-suppressing patterns. Codebook construction cannot use hidden interference powers; achievable suppression must be verified after quantization.
+with quantized phases. Geometric **beam steering** aligns reception with the serving satellite. **Interference-aware beamforming** additionally trades desired-signal gain against suppression in other directions. Handover changes the serving satellite and requires network admission and synchronization.
 
-Each control interval selects a **communication beam and either no extra probe or one probe beam**. Receiver actions affect observations, service, and switching state; they do not change satellite trajectories or the nonadaptive interferers' activity.
+Use a shared feasible codebook, initially 8–16 receive patterns per candidate link, including matched and interference-suppressing beams. Recompute actual patterns after phase quantization. A phase-only array cannot realize arbitrary digital weights; nearly aligned desired and interfering signals may be inseparable.
 
-### Measurement interface and causality
+Switching satellites does not automatically remove a terrestrial broadband interferer. The improvement must follow from changed spatial discrimination, serving-link gain, or allocated frequencies.
 
-Normal communication pilots are available to every method. Extra probing uses the serving satellite's existing pilot resources, without requiring cooperation from interferers. Least-squares removal of the known pilot yields a scalar desired-channel estimate and residual interference-plus-noise power $y$. Under a locally constant channel and independent complex-Gaussian residual samples,
+### Resource and interference assumptions
 
-$$
-y\mid\xi_t,m\sim\mathrm{Gamma}\left(L-1,\frac{q_m}{L-1}\right),
-\qquad q_m=\mathbf v_m^H\mathbf R_t\mathbf v_m.
-$$
+The initial model uses orthogonal time–frequency resources within each satellite and frequency reuse across satellites. Satellite transmit patterns follow a declared geometric rule, with fixed per-resource-block power; unrestricted transmit-precoder and power optimization are deferred.
 
-The desired-channel estimate is also noisy and must be included in the observation update. Waveform validation will test correlated samples, CFO, asynchronous OFDM, and pilot contamination, which can bias this likelihood.
-
-The initial implementation uses control-boundary updates: a probe cannot affect a beam selected before its report arrives. Reports carry sampling and availability timestamps. Same-interval updating is a required comparison; a one-interval processing delay must not be presented as satellite round-trip delay.
-
-### Communication objective
-
-Maximize successfully delivered data after normal pilots, probing, switching, and actual computation delay. With normalized service $g_t=D_t/(B\Delta)$ and low-service indicator $v_t=\mathbf1\{g_t<g_{\min}\}$,
+Let $x_{u,s}(\ell)$ denote an established connection, $\rho_{u,s}(\ell)$ a target reservation, and $V_{u,s}(\ell)$ geometric service eligibility. At every execution subslot,
 
 $$
-\max_\pi\;\mathbb E[\overline g]
-\quad\text{s.t.}\quad
-\mathbb E[\overline v]\leq\epsilon,\qquad
-\mathbb E\!\left[\frac{\sum_t\tau_m(m_t)}{T\Delta}\right]\leq\beta.
+\sum_sx_{u,s}\leq1,\qquad x_{u,s}\leq V_{u,s},\qquad
+\sum_u(x_{u,s}+\rho_{u,s})\leq C_s.
 $$
 
-Use a common causal MCS rule and BLER curves, accumulating delivery over data subslots when activity changes within an interval. Shannon rate is only a debugging surrogate. Count overlapping overhead once and retain all difficult periods in evaluation.
+$C_s$ represents the explicitly modeled service-beam/session capacity, not an arbitrary device for forcing reassignment. An active session and its reservation cannot occupy the same satellite twice. Compare this abstraction with relaxed context capacity and time-shared beams.
 
-These are **average constraints, not hard per-slot guarantees**. Finite-horizon planning uses validation-tuned Lagrange prices, then freezes them for testing. Report goodput–probing–reliability Pareto curves and identify infeasible reliability targets.
-
-## 3. Proposed contributions and technical approach
-
-### A. Identify information needed for future beam decisions
-
-A communication action only queries interference projections
+For binary actual resource assignment $a_{u,s,q}$ and reserved assignment $r_{u,s,q}$,
 
 $$
-I(a,t)=\mathbf g_{a,t}^{T}\mathbf p_t,
-\qquad [\mathbf g_{a,t}]_j=|\mathbf w_{a,t}^{H}\mathbf a_{j,t}|^2,
+\sum_u(a_{u,s,q}+r_{u,s,q})\leq1,\qquad
+a_{u,s,q}\leq x_{u,s},\qquad r_{u,s,q}\leq\rho_{u,s}.
 $$
 
-rather than necessarily requiring complete CSI or covariance recovery.
+Reservations consume declared capacity but emit no signal. A new user need not displace an existing user if sharing remains feasible. Geographic competition must arise from real coverage and common resource pools; distant US terminals do not automatically contend with each other.
 
-For a simplified noiseless linear model, let observations be $\mathbf y=O_t\mathbf p_t$, future powers satisfy $\mathbf p_{t+k}=F_k\mathbf p_t$, and stack future action projections into $T_t$. These projections are identifiable exactly when
-
-$$
-\ker O_t\subseteq\ker T_t
-\quad\Leftrightarrow\quad
-\operatorname{row}(T_t)\subseteq\operatorname{row}(O_t).
-$$
-
-This is a standard linear-algebra condition, not a claimed new theorem. Its purpose is to guide sensing and characterize decision ambiguity. Positivity restrictions and process noise require separate treatment.
-
-**Critical check:** $T_t$ may have full column rank. We must measure its singular spectrum rather than assume a low-dimensional task state. If exact reduction is unavailable, focus on finite-precision action comparisons: which uncertainty can reverse a near-optimal decision? Uniform utility error $\delta$ implies at most $2\delta$ one-step selection regret, but threshold-based reliability requires additional analysis.
-
-### B. Derive geometry-based bounds for pruning plans and probes
-
-This is the intended concrete distinction from generic learned-POMDP planning.
-
-Use jointly calibrated trajectory sets for interference powers and serving-link gain. Known future array gains convert these sets into SINR, service, and plan-value intervals $[J_P^-,J_P^+]$, including switching state and costs. Prune a plan only if
+The received SINR is
 
 $$
-J_P^+<\max_{P'}J_{P'}^-.
+\Gamma_{u,s,q}=
+\frac{S_{u,s,q}|\mathbf w_u^H\mathbf a_{u,s}|^2}
+{\mathbf w_u^H(\mathbf R^{\mathrm{ext}}_{u,q}
++\mathbf R^{\mathrm{net}}_{u,q}+\sigma_q^2\mathbf I)\mathbf w_u}.
 $$
 
-For a fixed current communication action and declared tail-plan family, the conservative gap
+External interference follows a spatially consistent source process. Network-generated interference depends on actual scheduled transmissions, transmit directions, and occupied resources, and must be recomputed after each candidate action.
+
+The main scope excludes intersatellite routing and assumes adequate feeder/backhaul supply, with explicit context-transfer costs where applicable. Start with exogenous, temporally correlated rate demands; queueing is a separate extension. Each simulated user is an actual terminal, not a geographic region represented by one fictitious array.
+
+## 3. Partial observation and executable handovers
+
+A network controller receives delayed terminal measurements, satellite resource reports, and command acknowledgments. Terminals observe scalar pilot estimates, residual interference power, and decoding outcomes through their current beam. Candidate-link measurements require scheduled opportunities; complete current CSI is unavailable.
+
+A short pilot block can use LS desired-signal removal and, under independent complex-Gaussian residuals,
 
 $$
-\Delta_{\mathcal P}=\max_PJ_P^+-\max_PJ_P^-
+y\mid\xi,\mathbf w,\text{schedule}
+\sim\mathrm{Gamma}(L-1,\nu/(L-1)),
 $$
 
-bounds the possible improvement from perfect information. A probe need not be expanded if a valid lower bound on its immediate net utility cost exceeds that gap.
+where $\nu$ includes external interference, actual network interference, and noise; the second Gamma parameter is its scale. Desired-channel estimates are also noisy. Independently validate CFO, asynchronous OFDM, correlation, and pilot contamination.
 
-These certificates are **conditional on the trajectory set and plan family**, including permitted MCS sequences. Marginal prediction intervals do not establish simultaneous coverage. Unknown serving gain must be included, and current-beam dominance alone cannot justify skipping future sensing. Report coverage, erroneous pruning, and speedup; accept that loose intervals may provide no useful pruning.
+All methods initially share the same measurement schedule and budget. Task-aware extra probing is an optional extension rather than the central contribution.
 
-### C. Test whether learned dynamics improve decisions
+Track sampling, report arrival, computation completion, and command activation separately. Delayed observations update their sampling-time states before propagation. Remote coordination cannot assume instantaneous local control or free access to all users' current states.
 
-Use a hybrid model:
+Use an explicit state machine:
 
-- **Analytical:** orbit propagation, array responses, observation likelihood, report timing, SINR, and service/cost accounting.
-- **Learned:** activity persistence, effective log-power dynamics, and slow serving-link residuals.
+**CONNECTED → PREPARING → SWITCHING → CONNECTED**, with rejection, cancellation, timeout, and recovery branches.
 
-Start with a shared GRU transition model, activity/log-power mixture heads, and a particle belief updated by the analytical likelihood. Include a small common latent only when needed for correlated sources. Initial sizes: 64–128 hidden units, 2–3 mixture components, 128–256 particles, and a 3–5-model ensemble. Delayed measurements update their sampling-time states before replay to the present.
+The old link may continue during preparation, except for measurement gaps. Network-side target reservation does not imply dual reception. The single-RF terminal stops old-link data during retuning, synchronization, and access; failed attempts still incur costs.
 
-Train with transition likelihood, multi-step free-rollout projection scoring such as CRPS, and pre-assimilation observation likelihood. Simulated hidden-state supervision must be disclosed and offered equally to learning baselines; include an observable-feedback-only variant. Do not label actions using a single privileged future trajectory.
+A feasible final assignment may have no feasible transition. If two satellites are full, exchanging users cannot silently reserve extra capacity or occur as a free atomic swap. The planner must wait, find another destination, or explicitly release service and count the interruption. Resource occupancy and reservations are checked at every subslot. Commands specify targets; actual connections follow the state machine. Satellites maintain authoritative reservation ledgers and acknowledge versioned commands. Stale-command rejection, retries, and service losses are counted through the same executor for every method.
 
-**Learning is conditional, not a predetermined contribution:** if a properly configured HMM/HSMM/AR model performs equally well, retain the sensing mechanism and narrow the world-model claim.
+## 4. Objective and proposed method
 
-### Closed-loop planning
+### Optimize delivery and user protection
 
-1. Update belief using arrived reports and propagate available ephemerides.
-2. Enumerate feasible communication/probe pairs; apply only validated pruning rules.
-3. Sample possible reports, including normal pilots in the **no-extra-probe** branch.
-4. Update the entire belief for each report and optimize a shared tail plan.
-5. Average branch values, execute the current action, and replan after real feedback.
+Jointly choose satellite associations, resource reservations and allocations, handover start times, and receive-beam modes. Delivered bits are accumulated only over actual data subslots using a common causal MCS/BLER mapping. Pilot, measurement, computation-induced waiting, and handover losses enter the execution timeline once.
 
-The first version uses one observation branching layer and a multi-step open-loop beam-search tail. It is an approximate belief-space planner, not an optimal POMDP solution. A branch cannot reveal the hidden particle that generated its observation; reports arriving after the horizon cannot receive invented within-horizon value.
+The initial demand model caps delivery by the offered bits in each interval and records unmet demand; it does not silently carry backlog. Define $g_{u,t}=D_{u,t}/(R_{\mathrm{ref}}\Delta_N)$ and long-term average $\bar g_u$. A candidate objective is
 
-## 4. Data and initial experimental configuration
+$$
+\max_\pi\;\mathbb E\left[
+\sum_u\omega_u\log(\varepsilon_0+\bar g_u)
+-\lambda_{\mathrm{sig}}\overline C_{\mathrm{sig}}\right],
+$$
 
-Generate orbit geometry, transmitter illumination/activity, and array inputs first—not independently sampled beam SINRs. Use parameterized Walker constellations and a frozen public ephemeris snapshot for external geometry checks; real ephemerides are not real communication measurements.
+subject to resource feasibility and per-user low-service targets, with optional handover budgets. A low-service event occurs when delivery falls below a fixed fraction of active demand. Signaling penalties cover costs not already reflected in lost delivery.
 
-| Item | Proposed starting point |
+The rolling planner carries accumulated or explicitly smoothed user service into its fairness calculation and tests horizon-end effects; per-slot log rate is not automatically equivalent to the stated long-term objective. Report raw delivery alongside fairness utility. Do not sacrifice the same users repeatedly to improve the aggregate. Average reliability constraints are not hard guarantees; report infeasible operating regions and retain disrupted periods in evaluation.
+
+### Three contributions to test
+
+**1. Local recovery versus network-wide service cost.** Characterize how interference duration, angular separability, load, alternative coverage, and switching delay determine whether to stay, reshape the receive beam, reallocate resources, or migrate. Decompose a candidate plan's value into the affected user's benefit, other users' changes, and remaining overhead. This is an explanation of the full objective, not an extra penalty that double-counts other users' losses.
+
+**2. Predictive planning with explicit migration dependencies.** Construct a time-varying graph of feasible links, shared resources, interference, and reservation/release dependencies. Search keep/share/move/swap/bounded-chain candidates, retaining local beam recovery as an alternative. Validate every candidate against the protocol timeline. The intended contribution is improved communication performance per unit of computation compared with equally informed generic MPC, not merely using a graph.
+
+**3. Decision value of probabilistic dynamics.** Test whether learned interference persistence and demand correlations improve joint control relative to correctly configured HMM/HSMM/AR models using the same planner. If classical prediction suffices, retain the planning contribution and narrow the world-model claim.
+
+### Hybrid world model and planner
+
+Compute orbits, array responses, resource conservation, switching stages, controlled interference, and delivery analytically. Learn unknown external-source activity, power/link residuals, and demand dynamics. Network load and protocol states evolve through explicit action-dependent updates; receiver actions do not change exogenous orbits or nonadaptive interferer activity.
+
+Start with shared GRU probability models, a structured particle belief, and an ensemble. Use graph interactions or shared latent factors when needed for cross-user/source dependence. Independent terminal sampling cannot represent a common interferer. Nationwide particle filtering requires factorization and scalability checks.
+
+Train with transition likelihood, pre-assimilation observation likelihood, and proper multi-step projection/delivery scores such as CRPS. Disclose simulated hidden-state supervision and match it across baselines. Future action labels must integrate over current uncertainty and future randomness, not reveal a single privileged trajectory.
+
+The initial controller uses **scenario MPC with a common open-loop tail**, evaluating association, resources, and receive beams together through nested search/iteration. It replans after actual reports. Future actions cannot depend on hidden scenario identity. Explicit observation branching is optional and must obey report arrival times.
+
+Bounded neighborhoods and migration-chain depth are computational approximations. Account for boundary users and interference. Optional plan-value interval pruning requires joint coverage and applies only to the declared plan family; report erroneous pruning. Small discrete instances should provide exhaustive or certified optimization references.
+
+## 5. Experimental plan
+
+### Configuration and data
+
+| Item | Starting configuration, subject to validation |
 |---|---|
-| Geometry and radio | Approximately 600 km altitude, 25° elevation threshold; 20 GHz / 20 MHz |
-| Receiver | $16\times16$ half-wavelength array, 1 RF chain, 4-bit phases; compare other array sizes and 2/4 RF chains |
-| Timing | $\Delta=0.2$ s; sweep 0.02–1 s; horizons 1/5/10/20 steps |
-| Sensing | 16/64/256 effective independent pilot samples; 0–10% extra probing; measured and swept report delays |
-| Data scale | 200–500 diagnostic episodes; initially 8,000 training episodes of 120 s, approximately 4.8 million steps |
-| Held-out data | 1,000 validation, 1,000 calibration, at least 2,000 ID-test episodes; initially 500 per OOD category |
+| Geography and users | Contiguous US; 6–12-user mechanism examples, approximately 60-terminal main case; 20/100/200 scaling |
+| Satellites | Orbit-derived union of eligible satellites; report per-user candidates and overlap instead of imposing unrealistic counts |
+| Radio and payload | Approximately 600 km altitude, 25° elevation threshold, 20 GHz / 20 MHz; 20 resource blocks; initial $C_s=8$ |
+| Terminal | $16\times16$ half-wavelength array, one RF chain, 4-bit phases; vary array size and RF count |
+| Time scales | Network period 1 s; geometric tracking 0.1 s; horizons 1/5/10/20/60 periods |
+| Execution costs | Explicit reporting, command, reservation, synchronization, failure, and recovery times; zero-cost cases only as controls |
+| Data | Initially 8,000 training episodes of 600 s; 1,000 validation, 1,000 calibration, at least 2,000 ID test; 500 per initial OOD category |
 
-All values are research configurations, not claims about a commercial system. Verify link budgets, array normalization, natural harmful-interference incidence, angular motion relative to beamwidth, activity correlation time, and achievable codebook gains before training.
+These are research settings, not commercial specifications. Validate link budgets, feasible post-quantization beam gains, natural interference/competition incidence, and motion relative to beamwidth before learning.
 
-Use three generator levels: matched static/AR/HMM diagnostics; traffic/scheduling-driven or semi-Markov activity with correlated power; and independent mechanisms for OOD testing. Collect mixed periodic-scan, classical-control, random-feasible, and event-driven trajectories.
+Generate geometry and external traffic/interference first, then simulate action-dependent scheduling, network interference, measurements, and protocol execution. Mix conventional and exploratory legal policies. Counterfactual branches share exogenous traces but recompute controlled outcomes. Split by geographic/scenario groups and orbit passes before windowing; isolate privileged labels. Real ephemerides are not real communication measurements.
 
-Separate controller-visible logs from privileged labels. Split by orbit pass, location, time block, and interference layout **before** creating windows; keep all counterfactual branches together. Index exogenous random streams independently of actions. Distinguish zero-shot transfer, adaptation, and retraining.
+### Required comparisons and evidence
 
-## 5. Evidence needed to support the paper
+Strong baselines include independent predictive handover with admission control; global one-step allocation; deterministic load-aware multistep MPC; classical probabilistic dynamics with the same planner; generic scenario MPC with the proposed model; and an adapted MAPPO/TarMAC policy. Match information, measurement costs, codebooks, execution constraints, supervision, and actual runtime budgets.
 
-### Strong comparisons
-
-The decisive baselines are a **strong geometry/timing-aware probing rule**, **HMM/HSMM/AR dynamics with the same observation-branch planner**, and a **generic learned-POMDP planner with the same model, geometry, likelihood, and unpruned search space**.
-
-Also include periodic scanning, uncertainty/information-gain probing, fixed probing with the proposed model, and full-covariance/black-box prediction with the same planner. Recurrent model-free RL is supplementary. Full-state, noncausal-future, and full-digital references must be labeled by their extra information or hardware.
-
-Match information, hardware, supervision, actual probing time, and computation. With ample search, pruning should approach the unpruned planner's quality; its benefit should appear in computation saved or performance under a fixed runtime budget.
-
-### Essential experiments
-
-| Question | Required evidence |
+| Test | Main evidence |
 |---|---|
-| Does the physical problem exist? | Before learning: observation ambiguity, harmful-interference frequency, and feasible beam gains under natural geometry |
-| Does probing improve communication? | Delivered-data Pareto curves at matched probing cost and low-service rate |
-| Does information change decisions? | Similar current observations but different future optimal beams; reverse probe priority by changing geometry, delay, or persistence |
-| Does the proposed mechanism matter? | Task-rank analysis, action regret, interval coverage, pruning errors, and runtime savings |
-| Are learning and branching both needed? | A 2×2 study: strongest classical vs. learned dynamics, crossed with strong-rule vs. observation-branch probing |
-| Is geometry genuinely useful? | Correct future geometry vs. frozen geometry and black-box geometry inputs, stratified by angular motion/beamwidth |
-| Where should gains disappear? | No harmful interference, independent random activity, fresh full observation, inseparable directions, excessive delays, and nearly static geometry |
-| Does it survive mismatch? | New activity mechanisms, unregistered sources, ephemeris/array errors, CFO and pilot contamination; independent waveform simulation or hardware-in-the-loop validation |
+| Physical necessity | Natural coverage/resource competition, feasible receive-pattern gains, and harmful-interference incidence |
+| Main performance | Delivery–low-service–handover/interruption Pareto curves across load and interference |
+| Proactive release | A's migration cost versus B's opportunity and incumbent users' losses |
+| Local versus network control | Beam-only, association-only, and joint control across angular separation and disturbance duration |
+| Reassignment dependencies | Reservation, full-load swaps, failed handovers, chain depth, and per-user consequences |
+| Prediction and learning | One-step versus multistep; classical/learned dynamics × independent/joint planning |
+| Fairness and scale | Tail service, repeated displacement, regional outcomes, runtime, and larger networks |
+| Independent validation | New generators, waveform-level pilot/data simulation, or hardware-in-the-loop evidence |
 
-Report mean delivery, 5th-percentile service, low-service fraction, longest low-service run, probing/switching time, and p50/p95/p99 decision latency. Evaluate calibration and action regret alongside prediction error. Use at least five training seeds and paired, scenario-group bootstrap intervals; correlated slots are not independent trials. Preserve reproducible configurations, data hashes, random streams, and baseline tuning/search budgets.
+Negative controls include spare capacity, no harmful interference, unpredictable activity, fresh complete observations, inseparable directions, long delays, and very low/high switching costs. Gains should not require artificial displacement or selectively chosen rare encounters.
 
-## 6. Positioning, milestones, and advisor decisions
+Report actual delivery, demand satisfaction, fifth-percentile user service, longest interruption, attempted/successful/failed handovers, reservation waste, and p50/p95/p99 decision latency. Use at least five training seeds and paired scenario-group bootstrap intervals. Do not treat correlated users or slots as independent trials. Include actual runtime in command activation and distinguish expected BLER-based delivery from packet-level outcomes.
 
-**Novelty to establish:** a computable, cost-aware mechanism for identifying and resolving future receive-beam ambiguity under limited RF observations—not simply “world models for satellites.” The identifiability argument, information-value principle, and interval dominance each have existing foundations.
+## 6. Positioning and decisions for my advisor
 
-The full plan identifies close work on [learned beam-training POMDPs](https://arxiv.org/abs/2107.05466), [active Bayesian beam tracking](https://arxiv.org/abs/2106.11281), [active sensing for beam tracking](https://arxiv.org/abs/2405.03129), [LEO geometry-based tracking](https://arxiv.org/abs/2410.21658), [NTN physics-informed digital twins](https://arxiv.org/abs/2605.23155), [DWM-RO](https://arxiv.org/html/2511.05972v3), and [scanning-array covariance estimation](https://www.ll.mit.edu/r-d/publications/covariance-estimation-scanning-arrays-fy23-rf-systems-technical-investment-program). Extend that comparison before claiming novelty.
+Existing work already covers [load-balanced predictive handover](https://ieeexplore.ieee.org/document/10564237/), [GNN association with admission control](https://www.sciencedirect.com/science/article/pii/S2405959525000098), [MARL handover and power allocation](https://ieeexplore.ieee.org/abstract/document/11667348/), and [handover-aware cooperative beamforming/scheduling](https://arxiv.org/abs/2603.07434). Multiuser coordination, switching penalties, and graph learning alone are insufficient novelty.
 
-**Evidence-based milestones:**
+The distinction to establish is **joint local receive-beam recovery and executable network reassignment under partial interference observations, with future service costs to other users explicitly evaluated**. Unlike the locally reviewed graph-world-model beamforming paper's single-step performance surrogate under fixed association, this proposal includes temporal resource and protocol states. Novelty still requires a fuller comparison.
 
-1. Validate the link budget, feasible codebook, observation interface, and natural interference encounters.
-2. Demonstrate useful decision-changing measurements with a known-model planner and strong classical baseline.
-3. Establish task analysis, reproducible data, and fair learned-POMDP comparisons.
-4. Test learning and pruning separately; remove components without measurable value.
-5. Complete OOD, negative-control, runtime, and independent waveform/hardware validation before finalizing claims.
+**Milestones:** validate physical opportunities and capacity; implement the reservation/handover state machine; demonstrate mechanisms with strong classical MPC; isolate learning and search gains; complete nationwide/OOD, fairness, runtime, and independent waveform/hardware tests.
 
-Revise the direction if gains depend on artificial delays, privileged information, weak baselines, or selectively sampled rare encounters. If feasible receive beams cannot improve the physical link, report that boundary rather than alter the reward to hide it.
+Revise the direction if gains rely on free future CSI, unrealistic delays, forced displacement, weak baselines, or infeasible transitions. Remove unnecessary learned components rather than treating model complexity as a contribution.
 
-**Questions for my advisor:**
+**Advisor discussion:**
 
-- Is the single-RF, cross-system interference scenario sufficiently compelling, and are its ephemeris and pilot-access assumptions defensible?
-- Should the central contribution be decision ambiguity and conditional pruning, with learned dynamics treated as optional?
-- What analytical result would make the contribution substantive beyond established active-sensing/POMDP methods?
-- Which independent waveform or hardware validation is feasible, and which evidence should determine whether we proceed to a full ICC paper?
+- Which operator information, pilot access, and control-delay assumptions are defensible?
+- How should resource pools and service-beam capacity map to a realistic payload?
+- Should the main contribution emphasize the local-beam/migration decision boundary or scalable executable joint planning?
+- Which independent waveform or hardware evidence can validate interference observations and handover costs?
