@@ -1,6 +1,8 @@
-# WorldNTN:
+# WorldNTN: 
 
 **Working title:** *Predictive Joint Receive Beamforming, Satellite Association, and Resource Reallocation under Partially Observed Interference*
+
+**Status:** Proposed research targeting IEEE ICC; no implementation or results are claimed. This version replaces the single-terminal, fixed-serving-satellite scope with coordinated multiuser, multisatellite control. It summarizes the [full Chinese research plan](WorldNTN_ICC_concrete_research_plan.md). Milestones follow evidence rather than a submission deadline.
 
 ## 1. Research question
 
@@ -130,19 +132,29 @@ The initial controller uses **scenario MPC with a common open-loop tail**, evalu
 
 Bounded neighborhoods and migration-chain depth are computational approximations. Account for boundary users and interference. Optional plan-value interval pruning requires joint coverage and applies only to the declared plan family; report erroneous pruning. Small discrete instances should provide exhaustive or certified optimization references.
 
+### Conditions under which a world model could offer an advantage
+
+Prioritize **history-inferable hidden regimes, spatially correlated dynamics, and persistent action consequences**. Similar current interference readings can arise from a short burst nearing completion or a persistent illumination period just beginning. Legal history, neighboring reports, and known geometry may distinguish them and reverse the stay-versus-migrate decision. Indistinguishable complete histories must retain uncertainty rather than receive privileged regime labels.
+
+Generate interference through external sessions/scheduling and physically shared sources, and demands through regional activity. Preserve joint temporal and spatial distributions: identical marginal means can imply different probabilities of simultaneous degradation and prolonged interruption. Capacity contention and handover commitments make these distinctions consequential. Known resource and protocol dynamics remain analytical; their existence alone does not establish a neural-model advantage.
+
+Compare predictable lifetime, report age, execution delay, and planning horizon. Historical information should lose value when delay exceeds predictability; long rollouts can accumulate enough error to reverse plan rankings. Choose rollout and fallback settings on validation data. [PETS](https://arxiv.org/abs/1805.12114) motivates uncertainty propagation and [MBPO](https://arxiv.org/abs/1906.08253) motivates controlling model bias; neither establishes superiority in this application.
+
+The comparator is not “world model versus MPC”: the proposal uses a world model **within** MPC. Include a calibrated joint GRU/Transformer forecaster with the same planner and sufficiently expressive HSMM alternatives, all with identical histories, geometry, and supervision. If a forecaster plus analytical execution has the same predictive interface, it is an equivalent hybrid-model class, not an inferior method by definition. Recurrent policy baselines must also receive the same history.
+
 ## 5. Experimental plan
 
 ### Configuration and data
 
-| Item                | Starting configuration, subject to validation                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Geography and users | Contiguous US; 6–12-user mechanism examples, approximately 60-terminal main case; 20/100/200 scaling                                 |
-| Satellites          | Orbit-derived union of eligible satellites; report per-user candidates and overlap instead of imposing unrealistic counts             |
-| Radio and payload   | Approximately 600 km altitude, 25° elevation threshold, 20 GHz / 20 MHz; 20 resource blocks; initial$C_s=8$                        |
-| Terminal            | $16\times16$ half-wavelength array, one RF chain, 4-bit phases; vary array size and RF count                                        |
-| Time scales         | Network period 1 s; geometric tracking 0.1 s; horizons 1/5/10/20/60 periods                                                           |
-| Execution costs     | Explicit reporting, command, reservation, synchronization, failure, and recovery times; zero-cost cases only as controls              |
-| Data                | Initially 8,000 training episodes of 600 s; 1,000 validation, 1,000 calibration, at least 2,000 ID test; 500 per initial OOD category |
+| Item | Starting configuration, subject to validation |
+|---|---|
+| Geography and users | Contiguous US; 6–12-user mechanism examples, approximately 60-terminal main case; 20/100/200 scaling |
+| Satellites | Orbit-derived union of eligible satellites; report per-user candidates and overlap instead of imposing unrealistic counts |
+| Radio and payload | Approximately 600 km altitude, 25° elevation threshold, 20 GHz / 20 MHz; 20 resource blocks; initial $C_s=8$ |
+| Terminal | $16\times16$ half-wavelength array, one RF chain, 4-bit phases; vary array size and RF count |
+| Time scales | Network period 1 s; geometric tracking 0.1 s; horizons 1/5/10/20/60 periods |
+| Execution costs | Explicit reporting, command, reservation, synchronization, failure, and recovery times; zero-cost cases only as controls |
+| Data | Initially 8,000 training episodes of 600 s; 1,000 validation, 1,000 calibration, at least 2,000 ID test; 500 per initial OOD category |
 
 These are research settings, not commercial specifications. Validate link budgets, feasible post-quantization beam gains, natural interference/competition incidence, and motion relative to beamwidth before learning.
 
@@ -152,18 +164,20 @@ Generate geometry and external traffic/interference first, then simulate action-
 
 Strong baselines include independent predictive handover with admission control; global one-step allocation; deterministic load-aware multistep MPC; classical probabilistic dynamics with the same planner; generic scenario MPC with the proposed model; and an adapted MAPPO/TarMAC policy. Match information, measurement costs, codebooks, execution constraints, supervision, and actual runtime budgets.
 
-| Test                         | Main evidence                                                                                             |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Physical necessity           | Natural coverage/resource competition, feasible receive-pattern gains, and harmful-interference incidence |
-| Main performance             | Delivery–low-service–handover/interruption Pareto curves across load and interference                   |
-| Proactive release            | A's migration cost versus B's opportunity and incumbent users' losses                                     |
-| Local versus network control | Beam-only, association-only, and joint control across angular separation and disturbance duration         |
-| Reassignment dependencies    | Reservation, full-load swaps, failed handovers, chain depth, and per-user consequences                    |
-| Prediction and learning      | One-step versus multistep; classical/learned dynamics × independent/joint planning                       |
-| Fairness and scale           | Tail service, repeated displacement, regional outcomes, runtime, and larger networks                      |
-| Independent validation       | New generators, waveform-level pilot/data simulation, or hardware-in-the-loop evidence                    |
+| Test | Main evidence |
+|---|---|
+| Physical necessity | Natural coverage/resource competition, feasible receive-pattern gains, and harmful-interference incidence |
+| Main performance | Delivery–low-service–handover/interruption Pareto curves across load and interference |
+| Proactive release | A's migration cost versus B's opportunity and incumbent users' losses |
+| Local versus network control | Beam-only, association-only, and joint control across angular separation and disturbance duration |
+| Reassignment dependencies | Reservation, full-load swaps, failed handovers, chain depth, and per-user consequences |
+| Prediction and learning | One-step versus multistep; classical/learned dynamics × independent/joint planning |
+| Fairness and scale | Tail service, repeated displacement, regional outcomes, runtime, and larger networks |
+| Independent validation | New generators, waveform-level pilot/data simulation, or hardware-in-the-loop evidence |
 
 Negative controls include spare capacity, no harmful interference, unpredictable activity, fresh complete observations, inseparable directions, long delays, and very low/high switching costs. Gains should not require artificial displacement or selectively chosen rare encounters.
+
+Add an **advantage-region experiment** over predictable lifetime relative to execution delay, resource load, historical information, and spatial correlation. Retain matched simple-model and unpredictable controls. Independently generate session/scheduler processes rather than use the learned architecture as the data generator. Report 10%/25%/50%/100% data curves and model reuse under changed service weights/budgets, counting all labels, simulator queries, training time, and online search. All prediction-based comparators may replan under the new objective.
 
 Report actual delivery, demand satisfaction, fifth-percentile user service, longest interruption, attempted/successful/failed handovers, reservation waste, and p50/p95/p99 decision latency. Use at least five training seeds and paired scenario-group bootstrap intervals. Do not treat correlated users or slots as independent trials. Include actual runtime in command activation and distinguish expected BLER-based delivery from packet-level outcomes.
 
