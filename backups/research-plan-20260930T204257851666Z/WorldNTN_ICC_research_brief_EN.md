@@ -179,7 +179,7 @@ Add an **advantage-region experiment** over predictable lifetime relative to exe
 
 Report actual delivery, demand satisfaction, fifth-percentile user service, longest interruption, attempted/successful/failed handovers, reservation waste, and p50/p95/p99 decision latency. Use at least five training seeds and paired scenario-group bootstrap intervals. Do not treat correlated users or slots as independent trials. Include actual runtime in command activation and distinguish expected BLER-based delivery from packet-level outcomes.
 
-## 6. Positioning and decisions
+## 6. Positioning and decisions for my advisor
 
 Existing work already covers [load-balanced predictive handover](https://ieeexplore.ieee.org/document/10564237/), [GNN association with admission control](https://www.sciencedirect.com/science/article/pii/S2405959525000098), [MARL handover and power allocation](https://ieeexplore.ieee.org/abstract/document/11667348/), and [handover-aware cooperative beamforming/scheduling](https://arxiv.org/abs/2603.07434). Multiuser coordination, switching penalties, and graph learning alone are insufficient novelty.
 

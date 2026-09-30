@@ -130,16 +130,6 @@ The initial controller uses **scenario MPC with a common open-loop tail**, evalu
 
 Bounded neighborhoods and migration-chain depth are computational approximations. Account for boundary users and interference. Optional plan-value interval pruning requires joint coverage and applies only to the declared plan family; report erroneous pruning. Small discrete instances should provide exhaustive or certified optimization references.
 
-### Conditions under which a world model could offer an advantage
-
-Prioritize **history-inferable hidden regimes, spatially correlated dynamics, and persistent action consequences**. Similar current interference readings can arise from a short burst nearing completion or a persistent illumination period just beginning. Legal history, neighboring reports, and known geometry may distinguish them and reverse the stay-versus-migrate decision. Indistinguishable complete histories must retain uncertainty rather than receive privileged regime labels.
-
-Generate interference through external sessions/scheduling and physically shared sources, and demands through regional activity. Preserve joint temporal and spatial distributions: identical marginal means can imply different probabilities of simultaneous degradation and prolonged interruption. Capacity contention and handover commitments make these distinctions consequential. Known resource and protocol dynamics remain analytical; their existence alone does not establish a neural-model advantage.
-
-Compare predictable lifetime, report age, execution delay, and planning horizon. Historical information should lose value when delay exceeds predictability; long rollouts can accumulate enough error to reverse plan rankings. Choose rollout and fallback settings on validation data. [PETS](https://arxiv.org/abs/1805.12114) motivates uncertainty propagation and [MBPO](https://arxiv.org/abs/1906.08253) motivates controlling model bias; neither establishes superiority in this application.
-
-The comparator is not “world model versus MPC”: the proposal uses a world model **within** MPC. Include a calibrated joint GRU/Transformer forecaster with the same planner and sufficiently expressive HSMM alternatives, all with identical histories, geometry, and supervision. If a forecaster plus analytical execution has the same predictive interface, it is an equivalent hybrid-model class, not an inferior method by definition. Recurrent policy baselines must also receive the same history.
-
 ## 5. Experimental plan
 
 ### Configuration and data
@@ -175,11 +165,9 @@ Strong baselines include independent predictive handover with admission control;
 
 Negative controls include spare capacity, no harmful interference, unpredictable activity, fresh complete observations, inseparable directions, long delays, and very low/high switching costs. Gains should not require artificial displacement or selectively chosen rare encounters.
 
-Add an **advantage-region experiment** over predictable lifetime relative to execution delay, resource load, historical information, and spatial correlation. Retain matched simple-model and unpredictable controls. Independently generate session/scheduler processes rather than use the learned architecture as the data generator. Report 10%/25%/50%/100% data curves and model reuse under changed service weights/budgets, counting all labels, simulator queries, training time, and online search. All prediction-based comparators may replan under the new objective.
-
 Report actual delivery, demand satisfaction, fifth-percentile user service, longest interruption, attempted/successful/failed handovers, reservation waste, and p50/p95/p99 decision latency. Use at least five training seeds and paired scenario-group bootstrap intervals. Do not treat correlated users or slots as independent trials. Include actual runtime in command activation and distinguish expected BLER-based delivery from packet-level outcomes.
 
-## 6. Positioning and decisions
+## 6. Positioning and decisions for my advisor
 
 Existing work already covers [load-balanced predictive handover](https://ieeexplore.ieee.org/document/10564237/), [GNN association with admission control](https://www.sciencedirect.com/science/article/pii/S2405959525000098), [MARL handover and power allocation](https://ieeexplore.ieee.org/abstract/document/11667348/), and [handover-aware cooperative beamforming/scheduling](https://arxiv.org/abs/2603.07434). Multiuser coordination, switching penalties, and graph learning alone are insufficient novelty.
 
