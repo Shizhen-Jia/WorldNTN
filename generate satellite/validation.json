@@ -51,14 +51,14 @@
     "nbclient": "0.11.0"
   },
   "files_sha256": {
-    "download_tle.ipynb": "69838926790e3cb97eb0d3d86ed44864562a34ddd24dc8545e2fc9420467b5d9",
-    "kuiper_approved_missing.ipynb": "f0e77b0b929fa7da8cea1a14a79e8e378cc5ad5be064be014dc461661ffac80b",
-    "kuiper_custom.ipynb": "e4cde59e1f0010bdaab2a85da0650b1f12b05bdbad17b2b536e076b72263243e",
-    "kuiper_real_tracker.ipynb": "d7ccb8a655c08139b500f4573650b21513116ba1111eb4238ecabe8c9918c750",
-    "oneweb_approved_missing.ipynb": "029d04bf7b62ed857a5afee12f379aa0a2fa56194fd2d144825537891babe468",
-    "oneweb_custom.ipynb": "b769af59eef553d3f10ee81c60e292ea8ce34da4bc932eefefc5c8f30e8ffb02",
-    "oneweb_real_tracker.ipynb": "2d27f69ba4c87a050fa8f0846df126af1ca82434ba015de8d501d8315124e0a9",
-    "starlink_real_tracker.ipynb": "e0e712edb2c9830d5c9677fb1cbd2c595e6ee7ed822989461b4dba96347a888e"
+    "download_tle.ipynb": "f129365e131a6cbfcf4ba30d157117bb05b781a3e0b6adfdfcea3f35cae75516",
+    "kuiper_approved_missing.ipynb": "fc60634671e384fb690552ddb15d865ca1c1709519211fe0c481a93f3548f09d",
+    "kuiper_custom.ipynb": "e667b077c89a5e51cf18acec474b08c0eda8edfd87eb1d8f50995731048413c2",
+    "kuiper_real_tracker.ipynb": "5cc2b86f94916e5924fabc8fa6e6d3d101304dcec56be3f21b4b70719a480cd4",
+    "oneweb_approved_missing.ipynb": "0c12c754a88738f6838e6afa1f7c74e8d1fbcbef6d7c7dedcac56cefee499826",
+    "oneweb_custom.ipynb": "d87f56fef4bc4dad95581c99ad3713e2e738f65fc69d801f50d93dd804517566",
+    "oneweb_real_tracker.ipynb": "ef4a4bcf31421b53e4bfb86576bf0fc41a0ddb50c8761f995ecb6d9f600a0839",
+    "starlink_real_tracker.ipynb": "96dffc3f931173e5fa8754f2465642e3a65709212e7242894fb2a2dbc95761bc"
   },
   "source_files_sha256": {
     "satellite_pipeline.py": "c05be285253010be287c6ec3ccfb5f7ffabd7779647af7e2d658c0a4132840e4",
@@ -72,5 +72,12 @@
     "kuiper_omm_and_tle_count": 391,
     "oneweb_omm_and_tle_count": 651
   },
-  "post_validation_changes": "Removed notebook numeric prefixes and updated titles, documentation, and error-message references. Recorded notebook execution results precede this naming-only change; hashes now describe the renamed files."
+  "post_validation_changes": "Removed notebook numeric prefixes and updated titles, documentation, and error-message references. Recorded notebook execution results precede this naming-only change; hashes now describe the renamed files. Translated notebook Markdown and accompanying documentation into English. Executable notebook cells and Python sources are identical to the previously validated versions. Notebook schema and Python syntax were checked after translation; prior execution results were not rerun for this documentation-only change. Hashes describe the current files.",
+  "english_translation_verification": {
+    "verified_on": "2026-10-05",
+    "notebooks_validated": 8,
+    "python_files_checked": 4,
+    "executable_content_unchanged": true,
+    "notebook_schema_and_syntax": "passed"
+  }
 }

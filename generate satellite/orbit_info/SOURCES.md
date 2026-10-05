@@ -1,37 +1,37 @@
-# 已核对的官方轨道参数
+# Verified official orbital parameters
 
-核对日期：2026-10-05。原始 PDF 保存在 `official_documents/`，URL、日期和 SHA256 见 `sources.json`。下表为指定批准版本的研究输入；不把申请受理、运营商规划或第三方干扰模型当作批准文件。
+Verified on 2026-10-05. Original PDFs are stored in `official_documents/`; URLs, dates, and SHA256 hashes are in `sources.json`. These tables provide research inputs from the specified approval versions. Application acceptance, operator plans, and third-party interference models are not treated as approvals.
 
 ## Amazon Kuiper / Amazon Leo Gen1
 
-[FCC DA 24-224，2024-03-08](https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf)第 1、4 段及脚注 11 批准修改星座参数：
+[FCC DA 24-224, 2024-03-08](https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf), paragraphs 1 and 4 and footnote 11, approves the modified constellation parameters:
 
-| 高度 km | 倾角 ° | 轨道面数 | 每面颗数 | 合计 |
+| Altitude km | Inclination ° | Orbital planes | Satellites per plane | Total |
 |---:|---:|---:|---:|---:|
 | 590 | 33 | 782 | 1 | 782 |
 | 590 | 30 | 1 | 2 | 2 |
 | 610 | 42 | 1292 | 1 | 1292 |
 | 630 | 51.9 | 289 | 4 | 1156 |
 
-合计 3,232。这里使用修改后的批准面数，没有直接沿用旧的 98 面、3,236 颗。文件的面数是许可参数，不能据此声称实际卫星已按均匀 RAAN 排列。
+Total: 3,232. This table uses the modified approved plane counts instead of the older 98-plane, 3,236-satellite configuration. Plane counts are authorization parameters and do not establish that actual satellites have uniformly spaced RAANs.
 
-[FCC DA 26-553，2026-06-05](https://docs.fcc.gov/public/attachments/DA-26-553A1.pdf)第 3 段及脚注 8 仍引用 Gen1 的 3,232 颗，并提及 2026-02-10 获批的 Gen2（3,212）和 Polar（1,292）。第 12–13 段对 Gen1 中期部署里程碑给予有限豁免；因此不能仅因 2026-07-30 已过，就自行把批准数量降为已发射数。
+[FCC DA 26-553, 2026-06-05](https://docs.fcc.gov/public/attachments/DA-26-553A1.pdf), paragraph 3 and footnote 8, still cites 3,232 Gen1 satellites and mentions Gen2 (3,212) and Polar (1,292), approved on 2026-02-10. Paragraphs 12–13 grant a limited waiver of the Gen1 interim deployment milestone. Passing 2026-07-30 therefore does not, by itself, justify reducing the approved population to the number already launched.
 
-**实现范围明确限定 Gen1。** 此处已核对的 2026 文件没有列出 Gen2/Polar 的完整批准壳层和 grant stamp 条件，故暂不将它们加入机器可读批准表，也不声称它们尚未获批。后续补入需核对 `SAT-LOA-20211104-00145` / `SAT-AMD-20250311-00068` 最终批文及适用条件。该范围仍足以为当前 Kuiper 真实目录生成独立的获批壳层补全场景。
+**The implementation is explicitly limited to Gen1.** The verified 2026 document does not list the complete approved Gen2/Polar shells and grant-stamp conditions. Those systems are therefore excluded from the machine-readable approval table for now; this does not imply that they are unapproved. Adding them requires checking the final grants and applicable conditions for `SAT-LOA-20211104-00145` / `SAT-AMD-20250311-00068`. The current scope is sufficient to generate a separate scenario that fills estimated gaps in the approved shells using the current Kuiper catalog.
 
 ## OneWeb Phase1
 
-[FCC DA 23-362，2023-04-28](https://docs.fcc.gov/public/attachments/DA-23-362A1.pdf)第 26 段批准美国市场准入配置，第 2、12 段给出/保留约 1200 km 运行高度：
+[FCC DA 23-362, 2023-04-28](https://docs.fcc.gov/public/attachments/DA-23-362A1.pdf), paragraph 26, approves the US market-access configuration. Paragraphs 2 and 12 specify or retain an operating altitude of approximately 1200 km:
 
-| 高度 km | 倾角 ° | 轨道面数 | 每面颗数 | 合计 |
+| Altitude km | Inclination ° | Orbital planes | Satellites per plane | Total |
 |---:|---:|---:|---:|---:|
 | 1200 | 87.9 | 12 | 49 | 588 |
 | 1200 | 55 | 8 | 16 | 128 |
 
-合计 716。这是 FCC 市场准入批准，并非用 FCC 文件替代英国航天发射或运营许可证。不要把已部署的极轨目录总数直接从 716 中相减，必须分别统计两个倾角壳层。该批文第 1 段将扩展至 6,372 颗的其余申请暂缓处理；本项目未将申请数字标为已批准。
+Total: 716. This is an FCC market-access approval, not a substitute for UK launch or operating licenses. Count the two inclination shells separately instead of subtracting the entire deployed polar catalog from 716. Paragraph 1 defers the remaining application to expand to 6,372 satellites; this project does not label that application population as approved.
 
-## 哪些不是官方给定的数据
+## Parameters not supplied by the official documents
 
-批准高度、倾角、轨道面数和数量可作为轨道模板约束；逐星未来历元、RAAN 起点、面间相位、平近点角、部署次序、业务状态和准确未发射名单没有从上述文件取得。代码显式设定模拟历元、圆形平均轨道、零阻力和相位分布，并将其写到 `generated/.../assumptions.json` 与 `synthetic_mean_elements.csv`。这些输出是 `approved_shell_synthetic`，不是真实 TLE，也不代表官方预测的位置。
+Approved altitude, inclination, plane count, and satellite count constrain the orbital templates. The cited documents do not supply future per-satellite epochs, RAAN origins, inter-plane phases, mean anomalies, deployment order, service status, or an exact list of unlaunched satellites. The code explicitly assumes a simulation epoch, circular mean orbits, zero drag, and phase distributions, recorded in `generated/.../assumptions.json` and `synthetic_mean_elements.csv`. These outputs are `approved_shell_synthetic`; they are neither real TLEs nor official position forecasts.
 
-英国/欧洲监管资料检索中出现的第三方许可附件包含多种 OneWeb 干扰分析配置；未将这些附件当作 OneWeb 自身获批星座的依据。本文表格仅采用已下载核对的 FCC 决定。
+Searches of UK/European regulatory material surfaced third-party licensing attachments with several OneWeb interference-analysis configurations. Those attachments were not treated as evidence of OneWeb's own approved constellation. The tables here use only the downloaded and verified FCC decisions.
