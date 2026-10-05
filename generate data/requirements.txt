@@ -1,0 +1,6 @@
+numpy>=1.24,<3
+pandas>=2.0,<4
+nbformat>=5.9,<6
+nbclient>=0.10,<1
+ipykernel>=6,<8
+pytest>=8,<10
