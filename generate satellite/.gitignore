@@ -1,0 +1,8 @@
+__pycache__/
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+outputs/
+tle/*/
+tle/snapshot_*.json
+orbit_info/generated/

@@ -1,0 +1,29 @@
+[
+  {
+    "document": "DA-24-224A1",
+    "decision_date": "2024-03-08",
+    "verified_on": "2026-10-05",
+    "authority": "FCC",
+    "source_url": "https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf",
+    "local_path": "official_documents/DA-24-224A1.pdf",
+    "sha256": "5aad03ceabe1e8f22e87d8c8e207ae483eabb78e069063ff0036035f8ea7d56a"
+  },
+  {
+    "document": "DA-23-362A1",
+    "decision_date": "2023-04-28",
+    "verified_on": "2026-10-05",
+    "authority": "FCC",
+    "source_url": "https://docs.fcc.gov/public/attachments/DA-23-362A1.pdf",
+    "local_path": "official_documents/DA-23-362A1.pdf",
+    "sha256": "aedc3a4605aacea24b6442aadf34fdd128c28d1f9a528d03de63423b8ad7832f"
+  },
+  {
+    "document": "DA-26-553A1",
+    "decision_date": "2026-06-05",
+    "verified_on": "2026-10-05",
+    "authority": "FCC",
+    "source_url": "https://docs.fcc.gov/public/attachments/DA-26-553A1.pdf",
+    "local_path": "official_documents/DA-26-553A1.pdf",
+    "sha256": "6ec0c7a1bb32f969e19d1372aef40cd9708934a2297aff2ce30f22b7b00135c2"
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "start_time_utc": "2026-10-05T12:25:45+00:00",
+  "snapshot_manifest": "tle/snapshot_20261005T122539_881828Z.json",
+  "duration_sec": 86400,
+  "interval_sec": 120,
+  "lat_deg": 39.95697,
+  "lon_deg": -105.16033,
+  "elev_m": 1660.0,
+  "elev_min_deg": 25.0,
+  "az_range_deg": [
+    0.0,
+    360.0
+  ],
+  "max_slant_km": 9999.0,
+  "max_element_age_days": 14.0,
+  "min_orbit_altitude_km": {
+    "starlink": 450.0,
+    "kuiper": 550.0,
+    "oneweb": 1100.0
+  },
+  "exclude_dtc": true,
+  "excluded_norad_ids": [],
+  "write_all_states": false
+}

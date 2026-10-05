@@ -1,0 +1,7 @@
+{
+  "description": "User-defined research scenarios. These are NOT approved operator plans. Counts represent additional synthetic satellites, not a target total including real satellites.",
+  "shells": [
+    {"constellation": "kuiper", "shell_id": "custom_kuiper_650_50", "altitude_km": 650, "inclination_deg": 50, "planes": 24, "satellites_per_plane": 32, "satellite_count": 768, "authorization_status": "hypothetical", "source_url": "user_defined", "raan_span_deg": 360, "walker_f": 1},
+    {"constellation": "oneweb", "shell_id": "custom_oneweb_1200_87p9", "altitude_km": 1200, "inclination_deg": 87.9, "planes": 24, "satellites_per_plane": 48, "satellite_count": 1152, "authorization_status": "hypothetical", "source_url": "user_defined", "raan_span_deg": 180, "walker_f": 1}
+  ]
+}

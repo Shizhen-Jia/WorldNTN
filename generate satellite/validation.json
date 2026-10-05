@@ -1,0 +1,76 @@
+{
+  "scope": "two timestamps; at most eight propagated satellites per notebook; full catalog shell accounting",
+  "workspace": "/tmp/worldntn-notebook-smoke-_dur6it6",
+  "results": [
+    {
+      "notebook": "download_tle.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "starlink_real_tracker.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "kuiper_real_tracker.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "oneweb_real_tracker.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "kuiper_approved_missing.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "oneweb_approved_missing.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "kuiper_custom.ipynb",
+      "status": "passed"
+    },
+    {
+      "notebook": "oneweb_custom.ipynb",
+      "status": "passed"
+    }
+  ],
+  "verified_on": "2026-10-05",
+  "unit_tests": {
+    "passed": 15,
+    "command": "python -m pytest -q tests"
+  },
+  "full_24h_simulation_run": false,
+  "python": "3.13.13",
+  "packages": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "skyfield": "1.55",
+    "sgp4": "2.27",
+    "nbformat": "5.11.1",
+    "nbclient": "0.11.0"
+  },
+  "files_sha256": {
+    "download_tle.ipynb": "69838926790e3cb97eb0d3d86ed44864562a34ddd24dc8545e2fc9420467b5d9",
+    "kuiper_approved_missing.ipynb": "f0e77b0b929fa7da8cea1a14a79e8e378cc5ad5be064be014dc461661ffac80b",
+    "kuiper_custom.ipynb": "e4cde59e1f0010bdaab2a85da0650b1f12b05bdbad17b2b536e076b72263243e",
+    "kuiper_real_tracker.ipynb": "d7ccb8a655c08139b500f4573650b21513116ba1111eb4238ecabe8c9918c750",
+    "oneweb_approved_missing.ipynb": "029d04bf7b62ed857a5afee12f379aa0a2fa56194fd2d144825537891babe468",
+    "oneweb_custom.ipynb": "b769af59eef553d3f10ee81c60e292ea8ce34da4bc932eefefc5c8f30e8ffb02",
+    "oneweb_real_tracker.ipynb": "2d27f69ba4c87a050fa8f0846df126af1ca82434ba015de8d501d8315124e0a9",
+    "starlink_real_tracker.ipynb": "e0e712edb2c9830d5c9677fb1cbd2c595e6ee7ed822989461b4dba96347a888e"
+  },
+  "source_files_sha256": {
+    "satellite_pipeline.py": "c05be285253010be287c6ec3ccfb5f7ffabd7779647af7e2d658c0a4132840e4",
+    "synthetic_orbits.py": "7b24abd758ed1eeb638724298ab1b1b4c81a6f2186e3d9573acc8195ce45139d"
+  },
+  "snapshot_summary": {
+    "starlink_omm_count": 11119,
+    "starlink_raw_tle_status": "HTTP 403",
+    "starlink_derived_tle_count": 10673,
+    "starlink_six_digit_ids_in_omm_only": 446,
+    "kuiper_omm_and_tle_count": 391,
+    "oneweb_omm_and_tle_count": 651
+  },
+  "post_validation_changes": "Removed notebook numeric prefixes and updated titles, documentation, and error-message references. Recorded notebook execution results precede this naming-only change; hashes now describe the renamed files."
+}

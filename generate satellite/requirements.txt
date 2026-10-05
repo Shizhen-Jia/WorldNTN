@@ -1,0 +1,9 @@
+numpy>=1.24,<3
+pandas>=2.0,<4
+requests>=2.31,<3
+skyfield>=1.49,<2
+sgp4>=2.23,<3
+nbformat>=5.9,<6
+ipykernel>=6,<8
+nbclient>=0.10,<1
+pytest>=8,<10

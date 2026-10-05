@@ -1,0 +1,7 @@
+constellation,shell_id,altitude_km,inclination_deg,planes,satellites_per_plane,satellite_count,authorization_status,authority,document,decision_date,source_location,source_url
+kuiper,kuiper_gen1_590_33,590,33,782,1,782,approved,FCC,DA 24-224,2024-03-08,paragraphs 1 and 4; footnote 11,https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf
+kuiper,kuiper_gen1_590_30,590,30,1,2,2,approved,FCC,DA 24-224,2024-03-08,paragraphs 1 and 4; footnote 11,https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf
+kuiper,kuiper_gen1_610_42,610,42,1292,1,1292,approved,FCC,DA 24-224,2024-03-08,paragraphs 1 and 4; footnote 11,https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf
+kuiper,kuiper_gen1_630_51p9,630,51.9,289,4,1156,approved,FCC,DA 24-224,2024-03-08,paragraphs 1 and 4; footnote 11,https://docs.fcc.gov/public/attachments/DA-24-224A1.pdf
+oneweb,oneweb_phase1_1200_87p9,1200,87.9,12,49,588,approved,FCC US market access,DA 23-362,2023-04-28,paragraphs 2 and 12 and 26,https://docs.fcc.gov/public/attachments/DA-23-362A1.pdf
+oneweb,oneweb_phase1_1200_55,1200,55,8,16,128,approved,FCC US market access,DA 23-362,2023-04-28,paragraphs 2 and 12 and 26,https://docs.fcc.gov/public/attachments/DA-23-362A1.pdf
