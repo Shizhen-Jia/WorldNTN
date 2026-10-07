@@ -134,6 +134,39 @@ NR-NTN supports measurement-assisted mobility and conditional handover using tim
 
 Make-before-break behavior requires overlapping coverage and suitable radio/network capabilities. Packet interruption, buffer transfer, gateway reachability, and user density still matter. A constellation or terminal advertised as “seamless” should not be modeled as guaranteeing zero interruption. [P4], [P7]
 
+### 6.1 Scheduled broadband handover: a patent-based abstraction
+
+**Figure 1.** Simplified from SpaceX patent US20240031892A1, Figs. 2–3C and its schedule-distribution description. Inter-node arrows show logical control-plane delivery; self-arrows summarize device-internal operations. [O12]
+
+```mermaid
+sequenceDiagram
+    participant R as Route distribution service
+    participant A as Source satellite A
+    participant U as User terminal
+    participant B as Target satellite B
+
+    Note over A,U: Existing link
+    R->>A: Advance schedule
+    A->>U: Forward schedule
+    R->>B: Target schedule
+    Note over R,B: Targets, frames/time slots, paths
+
+    par Terminal (Fig. 3A)
+        U->>U: CM requests MAC handover (SID, time)
+        U->>U: L2/L1 and beam pointing down
+        U->>U: L2/L1 and beam pointing up toward B
+    and Source (Fig. 3B)
+        A->>A: Update routes and reconfigure MAC/PHY and beams
+    and Target (Fig. 3C)
+        B->>B: CM requests MAC handover (cell, SIDs, time)
+        B->>B: Reconfigure MAC/PHY and beams
+    end
+
+    Note over U,B: Establish UT-B link with local completion/failure reporting
+```
+
+**Interpretation.** CM means connection manager; SID identifies a service, flow, or destination. Parallel branches do not prescribe simultaneous RF actions. Readiness/completion responses are local MAC-to-CM messages; the figure does not introduce a target-to-controller acknowledgment or an over-the-air handshake. The terminal tears down its old link before bringing up the new one. This patent embodiment does not establish make-before-break operation or verify deployed Starlink behavior. [O12]
+
 ## 7. What the research establishes—and what remains open
 
 | Selected literature | Main contribution | Limitation for interpreting commercial access |
@@ -188,6 +221,7 @@ Reference labels are clickable. **P** = research paper; **S** = normative standa
 - [O9] Amazon, *How Amazon Leo plans to connect mobile devices from space*, 2026 D2D proposal.
 - [O10] SpaceX, response to ISED **SMSE-008-26**, 2026; see responses Q1–Q2. Official source: `SMSE-008-26_SpaceX.pdf` in ISED's [comments bundle](https://ised-isde.canada.ca/site/spectrum-management-telecommunications/sites/default/files/documents/SMSE-008-026_comments_commentaires_0.zip).
 - [O11] ESA/MediaTek/Eutelsat and partners, *Rel-19 NR-NTN Connection over OneWeb LEO Satellites*, 3 November 2025; joint trial announcement.
+- [O12] SpaceX, *Low latency schedule-driven handovers*, US20240031892A1, published 25 January 2024; Figs. 2–3C and accompanying description. Patent embodiment; not deployment evidence. Comparison checked 7 October 2026.
 
 [P1]: https://arxiv.org/abs/2002.08811
 [P2]: https://arxiv.org/abs/2103.09156
@@ -217,3 +251,4 @@ Reference labels are clickable. **P** = research paper; **S** = normative standa
 [O9]: https://www.aboutamazon.com/news/amazon-leo/amazon-leo-direct-to-device-satellite-service-explained
 [O10]: https://ised-isde.canada.ca/site/spectrum-management-telecommunications/en/learn-more/key-documents/comments-received-smse-008-26-preliminary-consultation-mobile-satellite-service-developments-and-use
 [O11]: https://www.mediatek.com/press-room/esa-mediatek-eutelsat-airbus-sharp-itri-and-rs-announce-worlds-first-rel-19-5g-advanced-nr-ntn-connection-over-oneweb-leo-satellites
+[O12]: https://patents.google.com/patent/US20240031892A1/en
